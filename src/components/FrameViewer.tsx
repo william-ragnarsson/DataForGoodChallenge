@@ -35,6 +35,12 @@ const FrameViewer: React.FC = () => {
   const [currentError, setCurrentError] = useState<ErrorItem | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  
+  // Resizable pane widths (in percentage)
+  const [leftWidth, setLeftWidth] = useState(25);
+  const [rightWidth, setRightWidth] = useState(25);
+  const [isResizingLeft, setIsResizingLeft] = useState(false);
+  const [isResizingRight, setIsResizingRight] = useState(false);
 
   // Import all frames dynamically
   const getFrameImage = (frameNumber: number) => {
@@ -68,6 +74,43 @@ const FrameViewer: React.FC = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [end_frame, start_frame]);
+
+  // Handle resize for left pane
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isResizingLeft) {
+        const newWidth = (e.clientX / window.innerWidth) * 100;
+        if (newWidth >= 15 && newWidth <= 40) {
+          setLeftWidth(newWidth);
+        }
+      }
+      if (isResizingRight) {
+        const newWidth = ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
+        if (newWidth >= 15 && newWidth <= 40) {
+          setRightWidth(newWidth);
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingLeft(false);
+      setIsResizingRight(false);
+    };
+
+    if (isResizingLeft || isResizingRight) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizingLeft, isResizingRight]);
 
   const frameIndex = currentFrame - start_frame + 1;
 
@@ -165,13 +208,13 @@ const FrameViewer: React.FC = () => {
       {/* Left Column - Error/Annotation Section */}
       <div
         style={{
-          width: '25%',
+          width: `${leftWidth}%`,
           height: '100%',
           backgroundColor: '#1a1a1a',
-          borderRight: '2px solid rgba(155, 93, 229, 0.3)',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          position: 'relative'
         }}
       >
         <div
@@ -365,12 +408,47 @@ const FrameViewer: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        {/* Left Resize Handle */}
+        <div
+          onMouseDown={() => setIsResizingLeft(true)}
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: '8px',
+            cursor: 'col-resize',
+            backgroundColor: 'transparent',
+            zIndex: 10,
+            transition: 'background-color 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(155, 93, 229, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            if (!isResizingLeft) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          <div style={{
+            position: 'absolute',
+            right: '3px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '2px',
+            height: '40px',
+            backgroundColor: 'rgba(155, 93, 229, 0.6)',
+            borderRadius: '1px'
+          }} />
+        </div>
       </div>
 
       {/* Center Column - Image Viewer */}
       <div
         style={{
-          width: '50%',
+          width: `${100 - leftWidth - rightWidth}%`,
           height: '100%',
           backgroundColor: '#000',
           display: 'flex',
@@ -378,8 +456,7 @@ const FrameViewer: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
-          padding: '20px',
-          borderRight: '2px solid rgba(155, 93, 229, 0.3)'
+          padding: '20px'
         }}
       >
         <img
@@ -423,14 +500,50 @@ const FrameViewer: React.FC = () => {
       {/* Right Column - Chatbot Section */}
       <div
         style={{
-          width: '25%',
+          width: `${rightWidth}%`,
           height: '100%',
           backgroundColor: '#1a1a1a',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          position: 'relative'
         }}
       >
+        {/* Right Resize Handle */}
+        <div
+          onMouseDown={() => setIsResizingRight(true)}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: '8px',
+            cursor: 'col-resize',
+            backgroundColor: 'transparent',
+            zIndex: 10,
+            transition: 'background-color 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(155, 93, 229, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            if (!isResizingRight) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          <div style={{
+            position: 'absolute',
+            left: '3px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '2px',
+            height: '40px',
+            backgroundColor: 'rgba(155, 93, 229, 0.6)',
+            borderRadius: '1px'
+          }} />
+        </div>
+        
         <div
           style={{
             flex: '1',
