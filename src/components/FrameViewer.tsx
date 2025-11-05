@@ -66,11 +66,16 @@ const FrameViewer: React.FC = () => {
     <div 
       className="frame-viewer"
       style={{
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         backgroundColor: '#0a0a0a',
         display: 'flex',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
       }}
     >
       {/* Left Column - Error/Annotation Section */}
