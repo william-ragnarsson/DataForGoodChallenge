@@ -142,7 +142,7 @@ const ChatBot: React.FC = () => {
             }
           }}
         >
-          Verstuur
+          Send
         </button>
       </div>
     </div>
