@@ -35,6 +35,9 @@ const FrameViewer: React.FC = () => {
   const [currentError, setCurrentError] = useState<ErrorItem | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  // report UI state (no persistence)
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportText, setReportText] = useState("");
   
   // Resizable pane widths (in percentage)
   const [leftWidth, setLeftWidth] = useState(25);
@@ -150,6 +153,21 @@ const FrameViewer: React.FC = () => {
     }
   };
 
+  // --- Report (red exclamation) handlers ---
+  const openReport = () => setReportOpen(true);
+  const closeReport = () => {
+    setReportText("");
+    setReportOpen(false);
+  };
+
+  const submitReport = () => {
+    if (!reportText.trim()) return;
+    // ephemeral: clear the input and close the panel; do not persist
+    setReportText("");
+    setReportOpen(false);
+  };
+
+
   return (
     <div
       className="frame-viewer"
@@ -204,6 +222,60 @@ const FrameViewer: React.FC = () => {
           <span style={{ color: "#fca5a5", fontSize: 12 }}>{exportError}</span>
         ) : null}
       </div>
+      {/* Report button (red exclamation) - bottom left */}
+      <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 40 }}>
+        <button
+          onClick={openReport}
+          title="Report / comment on current frame"
+          style={{
+            backgroundColor: '#ef4444',
+            color: '#fff',
+            border: 'none',
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 700,
+            boxShadow: '0 6px 18px rgba(0,0,0,0.3)',
+            cursor: 'pointer',
+            position: 'relative'
+          }}
+        >
+          <span style={{ fontSize: 20, lineHeight: '20px' }}>!</span>
+        </button>
+      </div>
+
+      {/* Report input panel */}
+      {reportOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            left: 20,
+            bottom: 84,
+            zIndex: 50,
+            width: 320,
+            background: '#111',
+            color: '#fff',
+            borderRadius: 8,
+            padding: 12,
+            boxShadow: '0 8px 30px rgba(0,0,0,0.5)'
+          }}
+        >
+          <div style={{ fontSize: 14, marginBottom: 8 }}>Report comment for frame #{currentFrame}</div>
+          <textarea
+            value={reportText}
+            onChange={(e) => setReportText(e.target.value)}
+            placeholder="Describe what you disagree with or report..."
+            style={{ width: '100%', height: 100, padding: 8, borderRadius: 6, background: '#0b0b0b', color: '#fff', border: '1px solid #333' }}
+          />
+          <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'flex-end' }}>
+            <button onClick={closeReport} style={{ padding: '6px 10px', borderRadius: 6, background: '#333', color: '#fff', border: 'none' }}>Cancel</button>
+            <button onClick={submitReport} style={{ padding: '6px 10px', borderRadius: 6, background: '#ef4444', color: '#fff', border: 'none' }}>Submit</button>
+          </div>
+        </div>
+      )}
 
       {/* Left Column - Error/Annotation Section */}
       <div
