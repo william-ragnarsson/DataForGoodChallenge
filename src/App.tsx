@@ -1,7 +1,6 @@
-import FrameViewer from './components/FrameViewer'
 
-function App() {
+import FrameViewer from "./components/FrameViewer";
+
+export default function App() {
   return <FrameViewer />
 }
-
-export default App
