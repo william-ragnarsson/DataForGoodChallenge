@@ -51,7 +51,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ currentFrame, currentError }) => {
     }
 
     // Build comprehensive context
-    const systemPrompt = `You are CockPilot, an AI surgical training assistant helping student surgeons improve their technique.
+    const systemPrompt = `You are NORA AI, an AI surgical training assistant helping student surgeons improve their technique.
 
 CRITICAL INSTRUCTIONS:
 1. NEVER hallucinate or make up information not in the annotations
@@ -156,7 +156,7 @@ Remember: Be specific, reference frame numbers, don't hallucinate, and structure
             color: '#666',
             fontSize: '14px'
           }}>
-            <p style={{ margin: 0 }}>Ask CockPilot about the current frame</p>
+            <p style={{ margin: 0 }}>Ask NORA AI about the current frame</p>
             <p style={{ margin: '8px 0 0 0', fontSize: '12px', opacity: 0.7 }}>
               Get AI-powered feedback on surgical techniques
             </p>
@@ -194,7 +194,7 @@ Remember: Be specific, reference frame numbers, don't hallucinate, and structure
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>
-                CockPilot AI
+                NORA AI
               </div>
             )}
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown>
@@ -217,7 +217,7 @@ Remember: Be specific, reference frame numbers, don't hallucinate, and structure
               borderRadius: '50%',
               animation: 'spin 1s linear infinite'
             }} />
-            CockPilot is thinking...
+            NORA AI is thinking...
             <style>{`
               @keyframes spin {
                 0% { transform: rotate(0deg); }
