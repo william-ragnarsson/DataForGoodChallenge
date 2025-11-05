@@ -205,3 +205,23 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project layout: backend/ and frontend/
+# Ignore common backend Python virtual envs, caches, and local env files
+backend/.venv/
+backend/venv/
+backend/env/
+backend/__pycache__/
+backend/*.py[cod]
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/.env
+
+# Ignore common frontend artifacts (Node/npm/Yarn/Build)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.parcel-cache/
+frontend/.next/
+frontend/.env
