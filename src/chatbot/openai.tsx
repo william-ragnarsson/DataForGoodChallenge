@@ -11,5 +11,5 @@ export async function askAI(message: string): Promise<string> {
     messages: [{ role: "user", content: message }],
   });
 
-  return response.choices[0].message?.content || "Geen antwoord ontvangen.";
+  return response.choices[0].message?.content || "Response Error";
 }

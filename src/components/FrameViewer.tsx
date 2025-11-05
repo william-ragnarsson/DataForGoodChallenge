@@ -561,12 +561,11 @@ const FrameViewer: React.FC = () => {
             borderBottom: '2px solid rgba(155, 93, 229, 0.3)',
             paddingBottom: '12px'
           }}>
-            Cockpilot
+            NORA AI
           </h3>
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
             <ChatBot 
               currentFrame={currentFrame}
-              frameImageUrl={getFrameImage(currentFrame)}
               currentError={currentError}
             />
           </div>
