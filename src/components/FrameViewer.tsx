@@ -35,6 +35,12 @@ const FrameViewer: React.FC = () => {
   const [currentError, setCurrentError] = useState<ErrorItem | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  
+  // Resizable pane widths (in percentage)
+  const [leftWidth, setLeftWidth] = useState(25);
+  const [rightWidth, setRightWidth] = useState(25);
+  const [isResizingLeft, setIsResizingLeft] = useState(false);
+  const [isResizingRight, setIsResizingRight] = useState(false);
 
   // Import all frames dynamically
   const getFrameImage = (frameNumber: number) => {
@@ -68,6 +74,43 @@ const FrameViewer: React.FC = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [end_frame, start_frame]);
+
+  // Handle resize for left pane
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isResizingLeft) {
+        const newWidth = (e.clientX / window.innerWidth) * 100;
+        if (newWidth >= 15 && newWidth <= 40) {
+          setLeftWidth(newWidth);
+        }
+      }
+      if (isResizingRight) {
+        const newWidth = ((window.innerWidth - e.clientX) / window.innerWidth) * 100;
+        if (newWidth >= 15 && newWidth <= 40) {
+          setRightWidth(newWidth);
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingLeft(false);
+      setIsResizingRight(false);
+    };
+
+    if (isResizingLeft || isResizingRight) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizingLeft, isResizingRight]);
 
   const frameIndex = currentFrame - start_frame + 1;
 
@@ -165,115 +208,247 @@ const FrameViewer: React.FC = () => {
       {/* Left Column - Error/Annotation Section */}
       <div
         style={{
-          width: '25%',
+          width: `${leftWidth}%`,
           height: '100%',
           backgroundColor: '#1a1a1a',
-          borderRight: '2px solid rgba(155, 93, 229, 0.3)',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          position: 'relative'
         }}
       >
         <div
           style={{
             flex: '1',
             overflowY: 'auto',
-            padding: '20px'
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
           }}
         >
-          <h3 style={{ 
-            margin: '0 0 16px 0', 
-            fontSize: '18px', 
-            color: '#9b5de5',
-            fontWeight: 'bold',
-            borderBottom: '2px solid rgba(155, 93, 229, 0.3)',
-            paddingBottom: '12px'
-          }}>
-            Problems
-          </h3>
-          {currentError ? (
-            <div
-              style={{
-                backgroundColor: 'rgba(155, 93, 229, 0.15)',
-                border: '2px solid rgba(155, 93, 229, 0.6)',
-                borderRadius: '12px',
-                padding: '20px',
-                color: '#fff'
-              }}
-            >
+          {/* Current Error Section */}
+          <div>
+            <h3 style={{ 
+              margin: '0 0 16px 0', 
+              fontSize: '18px', 
+              color: '#9b5de5',
+              fontWeight: 'bold',
+              borderBottom: '2px solid rgba(155, 93, 229, 0.3)',
+              paddingBottom: '12px'
+            }}>
+              Current Frame
+            </h3>
+            {currentError ? (
               <div
                 style={{
-                  display: 'inline-block',
-                  backgroundColor: 'rgba(155, 93, 229, 0.9)',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  marginBottom: '12px'
+                  backgroundColor: 'rgba(155, 93, 229, 0.15)',
+                  border: '2px solid rgba(155, 93, 229, 0.6)',
+                  borderRadius: '12px',
+                  padding: '20px',
+                  color: '#fff'
                 }}
               >
-                Error Detected
-              </div>
-              <h2 style={{ 
-                margin: '0 0 12px 0', 
-                fontSize: '20px', 
-                fontWeight: 'bold',
-                color: '#9b5de5'
-              }}>
-                {currentError.type}
-              </h2>
-              <p style={{ 
-                margin: '0 0 16px 0', 
-                fontSize: '14px', 
-                lineHeight: '1.6',
-                color: '#e0e0e0'
-              }}>
-                {currentError.explanation}
-              </p>
-              {currentError.example_image && (
-                <div style={{ marginTop: '16px' }}>
-                  <p style={{ 
-                    fontSize: '12px', 
-                    color: '#aaa', 
-                    marginBottom: '8px',
-                    fontWeight: '500'
-                  }}>
-                    Reference Frame:
-                  </p>
-                  <img
-                    src={getFrameImage(parseInt(currentError.example_image.replace('.jpg', '')))}
-                    alt="Example"
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      borderRadius: '8px',
-                      border: '2px solid rgba(155, 93, 229, 0.4)'
-                    }}
-                  />
+                <div
+                  style={{
+                    display: 'inline-block',
+                    backgroundColor: 'rgba(155, 93, 229, 0.9)',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    marginBottom: '12px'
+                  }}
+                >
+                  Error Detected
                 </div>
-              )}
-            </div>
-          ) : (
-            <div style={{ 
-              color: '#666', 
-              textAlign: 'center', 
-              padding: '40px 20px',
-              fontSize: '14px'
+                <h2 style={{ 
+                  margin: '0 0 12px 0', 
+                  fontSize: '20px', 
+                  fontWeight: 'bold',
+                  color: '#9b5de5'
+                }}>
+                  {currentError.type}
+                </h2>
+                <p style={{ 
+                  margin: '0 0 16px 0', 
+                  fontSize: '14px', 
+                  lineHeight: '1.6',
+                  color: '#e0e0e0'
+                }}>
+                  {currentError.explanation}
+                </p>
+                {currentError.example_image && (
+                  <div style={{ marginTop: '16px' }}>
+                    <p style={{ 
+                      fontSize: '12px', 
+                      color: '#aaa', 
+                      marginBottom: '8px',
+                      fontWeight: '500'
+                    }}>
+                      Reference Frame:
+                    </p>
+                    <img
+                      src={getFrameImage(parseInt(currentError.example_image.replace('.jpg', '')))}
+                      alt="Example"
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        borderRadius: '8px',
+                        border: '2px solid rgba(155, 93, 229, 0.4)'
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ 
+                color: '#666', 
+                textAlign: 'center', 
+                padding: '40px 20px',
+                fontSize: '14px'
+              }}>
+                <p style={{ margin: 0 }}>No errors detected in current frame</p>
+                <p style={{ margin: '8px 0 0 0', fontSize: '12px', opacity: 0.7 }}>
+                  Navigate with arrow keys to explore the sequence
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* All Annotations List */}
+          <div>
+            <h3 style={{ 
+              margin: '0 0 12px 0', 
+              fontSize: '16px', 
+              color: '#9b5de5',
+              fontWeight: 'bold',
+              borderBottom: '2px solid rgba(155, 93, 229, 0.3)',
+              paddingBottom: '10px'
             }}>
-              <p style={{ margin: 0 }}>No errors detected in current frame</p>
-              <p style={{ margin: '8px 0 0 0', fontSize: '12px', opacity: 0.7 }}>
-                Navigate with arrow keys to explore the sequence
-              </p>
+              All Annotations ({data.errors.length})
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {data.errors.map((error, index) => {
+                const isActive = currentFrame >= error.range.start && currentFrame <= error.range.end;
+                const midFrame = Math.floor((error.range.start + error.range.end) / 2);
+                
+                return (
+                  <div
+                    key={index}
+                    onClick={() => setCurrentFrame(midFrame)}
+                    style={{
+                      padding: '12px',
+                      borderRadius: '8px',
+                      backgroundColor: isActive ? 'rgba(155, 93, 229, 0.25)' : 'rgba(0, 0, 0, 0.3)',
+                      border: isActive ? '2px solid rgba(155, 93, 229, 0.8)' : '1px solid rgba(155, 93, 229, 0.2)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      position: 'relative'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'rgba(155, 93, 229, 0.15)';
+                        e.currentTarget.style.border = '1px solid rgba(155, 93, 229, 0.4)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+                        e.currentTarget.style.border = '1px solid rgba(155, 93, 229, 0.2)';
+                      }
+                    }}
+                  >
+                    <div style={{
+                      fontSize: '10px',
+                      color: isActive ? '#9b5de5' : '#888',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      marginBottom: '6px',
+                      letterSpacing: '0.5px'
+                    }}>
+                      Frames {error.range.start}-{error.range.end}
+                    </div>
+                    <div style={{
+                      fontSize: '13px',
+                      color: isActive ? '#fff' : '#ccc',
+                      fontWeight: isActive ? 'bold' : 'normal',
+                      marginBottom: '4px'
+                    }}>
+                      {error.type}
+                    </div>
+                    <div style={{
+                      fontSize: '11px',
+                      color: '#999',
+                      lineHeight: '1.4',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}>
+                      {error.explanation}
+                    </div>
+                    {isActive && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: '#9b5de5',
+                        boxShadow: '0 0 8px rgba(155, 93, 229, 0.8)'
+                      }} />
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          )}
+          </div>
+        </div>
+        
+        {/* Left Resize Handle */}
+        <div
+          onMouseDown={() => setIsResizingLeft(true)}
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: '8px',
+            cursor: 'col-resize',
+            backgroundColor: 'transparent',
+            zIndex: 10,
+            transition: 'background-color 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(155, 93, 229, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            if (!isResizingLeft) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          <div style={{
+            position: 'absolute',
+            right: '3px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '2px',
+            height: '40px',
+            backgroundColor: 'rgba(155, 93, 229, 0.6)',
+            borderRadius: '1px'
+          }} />
         </div>
       </div>
 
       {/* Center Column - Image Viewer */}
       <div
         style={{
-          width: '50%',
+          width: `${100 - leftWidth - rightWidth}%`,
           height: '100%',
           backgroundColor: '#000',
           display: 'flex',
@@ -281,8 +456,7 @@ const FrameViewer: React.FC = () => {
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
-          padding: '20px',
-          borderRight: '2px solid rgba(155, 93, 229, 0.3)'
+          padding: '20px'
         }}
       >
         <img
@@ -326,14 +500,50 @@ const FrameViewer: React.FC = () => {
       {/* Right Column - Chatbot Section */}
       <div
         style={{
-          width: '25%',
+          width: `${rightWidth}%`,
           height: '100%',
           backgroundColor: '#1a1a1a',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          position: 'relative'
         }}
       >
+        {/* Right Resize Handle */}
+        <div
+          onMouseDown={() => setIsResizingRight(true)}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: '8px',
+            cursor: 'col-resize',
+            backgroundColor: 'transparent',
+            zIndex: 10,
+            transition: 'background-color 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(155, 93, 229, 0.5)';
+          }}
+          onMouseLeave={(e) => {
+            if (!isResizingRight) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          <div style={{
+            position: 'absolute',
+            left: '3px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '2px',
+            height: '40px',
+            backgroundColor: 'rgba(155, 93, 229, 0.6)',
+            borderRadius: '1px'
+          }} />
+        </div>
+        
         <div
           style={{
             flex: '1',
