@@ -246,8 +246,12 @@ const FrameViewer: React.FC = () => {
             Cockpilot
           </h3>
           <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
-            {/* Render the ChatBot component inside the sidebar */}
-            <ChatBot />
+            {/* Render the ChatBot component inside the sidebar and pass current frame/context */}
+            <ChatBot
+              currentFrame={currentFrame}
+              frameImageUrl={getFrameImage(currentFrame)}
+              currentError={currentError}
+            />
           </div>
         </div>
       </div>
