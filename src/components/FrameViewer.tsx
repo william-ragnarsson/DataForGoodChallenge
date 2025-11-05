@@ -52,128 +52,217 @@ const FrameViewer: React.FC = () => {
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         setCurrentFrame((prev) => Math.max(prev - 1, start_frame));
-      } else if (currentError) {
-        // Dismiss error popup on any key press
-        setCurrentError(null);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentError, end_frame, start_frame]);
-
-  const handleClick = () => {
-    if (currentError) {
-      setCurrentError(null);
-    }
-  };
+  }, [end_frame, start_frame]);
 
   const frameIndex = currentFrame - start_frame + 1;
 
   return (
     <div 
       className="frame-viewer"
-      onClick={handleClick}
       style={{
-        position: 'relative',
         width: '100vw',
         height: '100vh',
-        backgroundColor: '#000',
+        backgroundColor: '#0a0a0a',
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
         overflow: 'hidden'
       }}
     >
-      {/* Frame Image */}
-      <div style={{ position: 'relative', maxWidth: '90%', maxHeight: '85vh' }}>
+      {/* Left Side - Image Viewer (2/3) */}
+      <div
+        style={{
+          width: '66.66%',
+          height: '100%',
+          backgroundColor: '#000',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          padding: '20px'
+        }}
+      >
         <img
           src={getFrameImage(currentFrame)}
           alt={`Frame ${currentFrame}`}
           style={{
-            width: '100%',
+            maxWidth: '100%',
+            maxHeight: 'calc(100% - 80px)',
+            width: 'auto',
             height: 'auto',
             display: 'block',
-            borderRadius: '8px'
+            borderRadius: '8px',
+            objectFit: 'contain'
           }}
         />
 
-        {/* Error Popup Overlay */}
-        {currentError && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              backgroundColor: 'rgba(155, 93, 229, 0.95)',
-              color: '#fff',
-              padding: '24px 32px',
-              borderRadius: '12px',
-              maxWidth: '500px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
-              zIndex: 10,
-              cursor: 'pointer'
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setCurrentError(null);
-            }}
-          >
-            <h2 style={{ margin: '0 0 12px 0', fontSize: '24px', fontWeight: 'bold' }}>
-              {currentError.type}
-            </h2>
-            <p style={{ margin: '0 0 16px 0', fontSize: '16px', lineHeight: '1.5' }}>
-              {currentError.explanation}
-            </p>
-            {currentError.example_image && (
-              <div style={{ marginTop: '16px' }}>
-                <img
-                  src={getFrameImage(parseInt(currentError.example_image.replace('.jpg', '')))}
-                  alt="Example"
-                  style={{
-                    width: '100%',
-                    maxHeight: '200px',
-                    objectFit: 'contain',
-                    borderRadius: '8px',
-                    border: '2px solid rgba(255, 255, 255, 0.3)'
-                  }}
-                />
-              </div>
-            )}
-            <p style={{ 
-              marginTop: '16px', 
-              fontSize: '12px', 
-              opacity: 0.8,
-              fontStyle: 'italic' 
-            }}>
-              Click anywhere or press any key to dismiss
-            </p>
+        {/* Progress Counter */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: '#fff',
+            padding: '12px 24px',
+            borderRadius: '24px',
+            fontSize: '16px',
+            fontFamily: 'monospace',
+            border: '2px solid rgba(155, 93, 229, 0.5)',
+            zIndex: 5
+          }}
+        >
+          Frame {frameIndex} / {total_frames} (#{currentFrame})
+          <div style={{ fontSize: '12px', opacity: 0.7, marginTop: '4px', textAlign: 'center' }}>
+            Use ← → arrow keys to navigate
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Progress Counter */}
+      {/* Right Side - Sidebar (1/3) */}
       <div
         style={{
-          position: 'fixed',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          color: '#fff',
-          padding: '12px 24px',
-          borderRadius: '24px',
-          fontSize: '16px',
-          fontFamily: 'monospace',
-          border: '2px solid rgba(155, 93, 229, 0.5)',
-          zIndex: 5
+          width: '33.33%',
+          height: '100%',
+          backgroundColor: '#1a1a1a',
+          borderLeft: '2px solid rgba(155, 93, 229, 0.3)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}
       >
-        Frame {frameIndex} / {total_frames} (#{currentFrame})
-        <div style={{ fontSize: '12px', opacity: 0.7, marginTop: '4px', textAlign: 'center' }}>
-          Use ← → arrow keys to navigate
+        {/* Error/Annotation Section */}
+        <div
+          style={{
+            flex: '0 0 auto',
+            maxHeight: '50%',
+            overflowY: 'auto',
+            padding: '20px',
+            borderBottom: currentError ? '2px solid rgba(155, 93, 229, 0.3)' : 'none'
+          }}
+        >
+          {currentError ? (
+            <div
+              style={{
+                backgroundColor: 'rgba(155, 93, 229, 0.15)',
+                border: '2px solid rgba(155, 93, 229, 0.6)',
+                borderRadius: '12px',
+                padding: '20px',
+                color: '#fff'
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-block',
+                  backgroundColor: 'rgba(155, 93, 229, 0.9)',
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  marginBottom: '12px'
+                }}
+              >
+                Error Detected
+              </div>
+              <h2 style={{ 
+                margin: '0 0 12px 0', 
+                fontSize: '20px', 
+                fontWeight: 'bold',
+                color: '#9b5de5'
+              }}>
+                {currentError.type}
+              </h2>
+              <p style={{ 
+                margin: '0 0 16px 0', 
+                fontSize: '14px', 
+                lineHeight: '1.6',
+                color: '#e0e0e0'
+              }}>
+                {currentError.explanation}
+              </p>
+              {currentError.example_image && (
+                <div style={{ marginTop: '16px' }}>
+                  <p style={{ 
+                    fontSize: '12px', 
+                    color: '#aaa', 
+                    marginBottom: '8px',
+                    fontWeight: '500'
+                  }}>
+                    Reference Frame:
+                  </p>
+                  <img
+                    src={getFrameImage(parseInt(currentError.example_image.replace('.jpg', '')))}
+                    alt="Example"
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      borderRadius: '8px',
+                      border: '2px solid rgba(155, 93, 229, 0.4)'
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ 
+              color: '#666', 
+              textAlign: 'center', 
+              padding: '40px 20px',
+              fontSize: '14px'
+            }}>
+              <p style={{ margin: 0 }}>No errors detected in current frame</p>
+              <p style={{ margin: '8px 0 0 0', fontSize: '12px', opacity: 0.7 }}>
+                Navigate with arrow keys to explore the sequence
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Chatbot Section */}
+        <div
+          style={{
+            flex: '1',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '20px',
+            overflowY: 'auto'
+          }}
+        >
+          <h3 style={{ 
+            margin: '0 0 16px 0', 
+            fontSize: '18px', 
+            color: '#9b5de5',
+            fontWeight: 'bold',
+            borderBottom: '2px solid rgba(155, 93, 229, 0.3)',
+            paddingBottom: '12px'
+          }}>
+            AI Assistant
+          </h3>
+          <div style={{ 
+            flex: 1,
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            borderRadius: '8px',
+            padding: '16px',
+            color: '#888',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            border: '1px dashed rgba(155, 93, 229, 0.3)'
+          }}>
+            Chatbot interface coming soon...
+            <br />
+            <span style={{ fontSize: '12px', marginTop: '8px', display: 'block' }}>
+              This space will contain the AI training assistant
+            </span>
+          </div>
         </div>
       </div>
     </div>
