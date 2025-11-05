@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import annotationsData from '../assets/json-files/dummy-file.json';
+import ChatBot from '../chatbot/chatbot';
 
 interface Error {
   range: { start: number; end: number };
@@ -242,26 +243,11 @@ const FrameViewer: React.FC = () => {
             borderBottom: '2px solid rgba(155, 93, 229, 0.3)',
             paddingBottom: '12px'
           }}>
-            AI Assistant
+            Cockpilot
           </h3>
-          <div style={{ 
-            flex: 1,
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            borderRadius: '8px',
-            padding: '16px',
-            color: '#888',
-            fontSize: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            border: '1px dashed rgba(155, 93, 229, 0.3)'
-          }}>
-            Chatbot interface coming soon...
-            <br />
-            <span style={{ fontSize: '12px', marginTop: '8px', display: 'block' }}>
-              This space will contain the AI training assistant
-            </span>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
+            {/* Render the ChatBot component inside the sidebar */}
+            <ChatBot />
           </div>
         </div>
       </div>
