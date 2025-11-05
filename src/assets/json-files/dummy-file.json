@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "total_frames": 51,
+    "start_frame": 734,
+    "end_frame": 784,
+    "fps": 5,
+    "description": "Annotated surgical suturing sequence with labeled error intervals."
+  },
+
+  "errors": [
+    {
+      "range": { "start": 740, "end": 745 },
+      "type": "Needle misalignment",
+      "explanation": "The needle trajectory deviated from the intended insertion angle, risking asymmetric tissue penetration.",
+      "example_image": "742.jpg"
+    },
+    {
+      "range": { "start": 755, "end": 760 },
+      "type": "Suture tension too high",
+      "explanation": "Excessive pulling force was applied while tightening the suture, risking tissue tearing.",
+      "example_image": "757.jpg"
+    },
+    {
+      "range": { "start": 768, "end": 773 },
+      "type": "Instrument collision",
+      "explanation": "Two instruments made unintended contact, possibly compromising the sterile field.",
+      "example_image": "770.jpg"
+    },
+    {
+      "range": { "start": 776, "end": 780 },
+      "type": "Camera instability",
+      "explanation": "The endoscopic camera shook during a delicate step, reducing visibility.",
+      "example_image": "778.jpg"
+    }
+  ]
+}
