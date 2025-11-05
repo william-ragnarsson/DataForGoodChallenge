@@ -73,80 +73,35 @@ const FrameViewer: React.FC = () => {
         overflow: 'hidden'
       }}
     >
-      {/* Left Side - Image Viewer (2/3) */}
+      {/* Left Column - Error/Annotation Section */}
       <div
         style={{
-          width: '66.66%',
-          height: '100%',
-          backgroundColor: '#000',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          padding: '20px'
-        }}
-      >
-        <img
-          src={getFrameImage(currentFrame)}
-          alt={`Frame ${currentFrame}`}
-          style={{
-            maxWidth: '100%',
-            maxHeight: 'calc(100% - 80px)',
-            width: 'auto',
-            height: 'auto',
-            display: 'block',
-            borderRadius: '8px',
-            objectFit: 'contain'
-          }}
-        />
-
-        {/* Progress Counter */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
-            color: '#fff',
-            padding: '12px 24px',
-            borderRadius: '24px',
-            fontSize: '16px',
-            fontFamily: 'monospace',
-            border: '2px solid rgba(155, 93, 229, 0.5)',
-            zIndex: 5
-          }}
-        >
-          Frame {frameIndex} / {total_frames} (#{currentFrame})
-          <div style={{ fontSize: '12px', opacity: 0.7, marginTop: '4px', textAlign: 'center' }}>
-            Use ← → arrow keys to navigate
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Sidebar (1/3) */}
-      <div
-        style={{
-          width: '33.33%',
+          width: '25%',
           height: '100%',
           backgroundColor: '#1a1a1a',
-          borderLeft: '2px solid rgba(155, 93, 229, 0.3)',
+          borderRight: '2px solid rgba(155, 93, 229, 0.3)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden'
         }}
       >
-        {/* Error/Annotation Section */}
         <div
           style={{
-            flex: '0 0 auto',
-            maxHeight: '50%',
+            flex: '1',
             overflowY: 'auto',
-            padding: '20px',
-            borderBottom: currentError ? '2px solid rgba(155, 93, 229, 0.3)' : 'none'
+            padding: '20px'
           }}
         >
+          <h3 style={{ 
+            margin: '0 0 16px 0', 
+            fontSize: '18px', 
+            color: '#9b5de5',
+            fontWeight: 'bold',
+            borderBottom: '2px solid rgba(155, 93, 229, 0.3)',
+            paddingBottom: '12px'
+          }}>
+            Problems
+          </h3>
           {currentError ? (
             <div
               style={{
@@ -224,15 +179,79 @@ const FrameViewer: React.FC = () => {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Chatbot Section */}
+      {/* Center Column - Image Viewer */}
+      <div
+        style={{
+          width: '50%',
+          height: '100%',
+          backgroundColor: '#000',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          padding: '20px',
+          borderRight: '2px solid rgba(155, 93, 229, 0.3)'
+        }}
+      >
+        <img
+          src={getFrameImage(currentFrame)}
+          alt={`Frame ${currentFrame}`}
+          style={{
+            maxWidth: '100%',
+            maxHeight: 'calc(100% - 80px)',
+            width: 'auto',
+            height: 'auto',
+            display: 'block',
+            borderRadius: '8px',
+            objectFit: 'contain'
+          }}
+        />
+
+        {/* Progress Counter */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            color: '#fff',
+            padding: '12px 24px',
+            borderRadius: '24px',
+            fontSize: '16px',
+            fontFamily: 'monospace',
+            border: '2px solid rgba(155, 93, 229, 0.5)',
+            zIndex: 5
+          }}
+        >
+          Frame {frameIndex} / {total_frames} (#{currentFrame})
+          <div style={{ fontSize: '12px', opacity: 0.7, marginTop: '4px', textAlign: 'center' }}>
+            Use ← → arrow keys to navigate
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column - Chatbot Section */}
+      <div
+        style={{
+          width: '25%',
+          height: '100%',
+          backgroundColor: '#1a1a1a',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}
+      >
         <div
           style={{
             flex: '1',
             display: 'flex',
             flexDirection: 'column',
             padding: '20px',
-            overflowY: 'auto'
+            overflow: 'hidden'
           }}
         >
           <h3 style={{ 
@@ -245,7 +264,7 @@ const FrameViewer: React.FC = () => {
           }}>
             Cockpilot
           </h3>
-          <div style={{ flex: 1, overflowY: 'auto', padding: '8px' }}>
+          <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
             {/* Render the ChatBot component inside the sidebar */}
             <ChatBot />
           </div>

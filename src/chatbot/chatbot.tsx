@@ -39,35 +39,108 @@ const ChatBot: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-md mx-auto p-4 border rounded-2xl shadow-lg">
-
-      <div className="flex-1 overflow-y-auto h-80 space-y-2">
+    <div 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        height: '100%',
+        border: '2px solid rgba(155, 93, 229, 0.3)',
+        borderRadius: '12px',
+        backgroundColor: '#0a0a0a',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Messages container */}
+      <div 
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}
+      >
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`p-2 rounded-lg ${
-              m.sender === "user"
-                ? "bg-blue-500 text-white self-end"
-                : "bg-gray-200 text-black self-start"
-            }`}
+            style={{
+              padding: '12px',
+              borderRadius: '8px',
+              backgroundColor: m.sender === "user" ? 'rgba(59, 130, 246, 0.9)' : 'rgba(155, 93, 229, 0.2)',
+              color: '#fff',
+              maxWidth: '85%',
+              alignSelf: m.sender === "user" ? 'flex-end' : 'flex-start',
+              wordWrap: 'break-word',
+              fontSize: '14px',
+              lineHeight: '1.5'
+            }}
           >
             {m.text}
           </div>
         ))}
-        {loading && <p className="text-gray-500">AI is aan het typen...</p>}
+        {loading && (
+          <p style={{ color: '#9b5de5', fontSize: '14px', padding: '8px' }}>
+            AI is aan het typen...
+          </p>
+        )}
       </div>
 
-      <div className="flex mt-4">
+      {/* Input container */}
+      <div 
+        style={{
+          display: 'flex',
+          padding: '16px',
+          borderTop: '2px solid rgba(155, 93, 229, 0.3)',
+          backgroundColor: '#1a1a1a',
+          gap: '8px'
+        }}
+      >
         <input
-          className="flex-1 border rounded-l-lg p-2"
+          style={{
+            flex: 1,
+            padding: '10px 12px',
+            borderRadius: '8px',
+            border: '2px solid rgba(155, 93, 229, 0.4)',
+            backgroundColor: '#0a0a0a',
+            color: '#fff',
+            fontSize: '14px',
+            outline: 'none'
+          }}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !loading) {
+              handleSend();
+            }
+          }}
           placeholder="Typ je bericht..."
         />
         <button
-          className="bg-blue-600 text-white px-4 rounded-r-lg"
+          style={{
+            padding: '10px 16px',
+            borderRadius: '8px',
+            border: 'none',
+            backgroundColor: loading ? '#555' : 'rgba(155, 93, 229, 0.9)',
+            color: '#fff',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s'
+          }}
           onClick={handleSend}
           disabled={loading}
+          onMouseEnter={(e) => {
+            if (!loading) {
+              e.currentTarget.style.backgroundColor = 'rgba(155, 93, 229, 1)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!loading) {
+              e.currentTarget.style.backgroundColor = 'rgba(155, 93, 229, 0.9)';
+            }
+          }}
         >
           Verstuur
         </button>
