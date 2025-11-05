@@ -566,7 +566,6 @@ const FrameViewer: React.FC = () => {
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
             <ChatBot 
               currentFrame={currentFrame}
-              frameImageUrl={getFrameImage(currentFrame)}
               currentError={currentError}
             />
           </div>
