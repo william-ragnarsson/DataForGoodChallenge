@@ -1,13 +1,28 @@
 import React, { useState } from "react";
 import { askAI } from "./openai";
 import dummyData from "../assets/json-files/dummy-file.json";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
   sender: "user" | "ai";
   text: string;
 }
 
-const ChatBot: React.FC = () => {
+interface ErrorAnnotation {
+  range: { start: number; end: number };
+  type: string;
+  explanation: string;
+  example_image?: string;
+}
+
+interface ChatBotProps {
+  currentFrame?: number;
+  frameImageUrl?: string;
+  currentError?: ErrorAnnotation | null;
+}
+
+const ChatBot: React.FC<ChatBotProps> = ({ currentFrame, frameImageUrl, currentError }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,9 +36,23 @@ const ChatBot: React.FC = () => {
     setInput("");
     setLoading(true);
 
+    // Build frame-specific context to send along with dummy annotations
+    const frameInfoParts: string[] = [];
+    if (typeof currentFrame === "number") frameInfoParts.push(`Current frame: #${currentFrame}`);
+    if (frameImageUrl) frameInfoParts.push(`Frame image URL: ${frameImageUrl}`);
+    if (currentError) {
+      frameInfoParts.push(`Current error: ${currentError.type} — ${currentError.explanation}`);
+    }
+
+    const frameContext = frameInfoParts.length ? frameInfoParts.join("\n") + "\n\n" : "";
+
+    // add user profile / intent context (student surgeon, training video)
+    const userProfile =
+      "User profile: This user is a student training to become a surgeon. The provided video is general training data used for educational/training purposes.";
+
     // combine user input with the dummy JSON context so the AI always receives annotations
     const contextStr = JSON.stringify(dummyData, null, 2);
-    const combinedMessage = `Context (annotations):\n${contextStr}\n\nUser question:\n${text}`;
+    const combinedMessage = `Context (annotations):\n${contextStr}\n\n${frameContext}${userProfile}\n\nUser question:\n${text}`;
 
     try {
       const aiResponse = await askAI(combinedMessage);
@@ -77,7 +106,7 @@ const ChatBot: React.FC = () => {
               lineHeight: '1.5'
             }}
           >
-            {m.text}
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown>
           </div>
         ))}
         {loading && (
@@ -116,6 +145,12 @@ const ChatBot: React.FC = () => {
             }
           }}
           placeholder="Typ je bericht..."
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
         />
         <button
           style={{
