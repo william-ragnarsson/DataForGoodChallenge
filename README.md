@@ -1,10 +1,10 @@
-The **Surgical Feedback Viewer** is a React-based web application designed to assist surgical trainees in analyzing and improving their techniques. It provides an interactive interface to review surgical procedure videos, identify errors, and generate detailed feedback reports in PDF format. The application integrates AI-powered feedback and annotations to enhance the learning experience.
+NORA.AI is a React-based web application designed to assist surgical trainees in analyzing and improving their techniques. It provides an interactive interface to review surgical procedure videos, identify errors, and generate detailed feedback reports in PDF format. The application integrates AI-powered feedback and annotations to enhance the learning experience.
 
 ## Features
 
 - **Frame-by-Frame Navigation**: Navigate through surgical procedure frames with keyboard controls.
 - **Error Annotations**: View detailed annotations for errors detected in specific frames.
-- **AI-Powered Chatbot**: Ask NORA AI for insights and suggestions on surgical techniques.
+- **AI-Powered Chatbot**: Ask NORA.AI for insights and suggestions on surgical techniques.
 - **PDF Report Generation**: Generate comprehensive feedback reports in PDF format.
 - **Customizable Branding**: Tailor the report's branding to your organization.
 
