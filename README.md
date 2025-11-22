@@ -1,73 +1,80 @@
-# React + TypeScript + Vite
+The **Surgical Feedback Viewer** is a React-based web application designed to assist surgical trainees in analyzing and improving their techniques. It provides an interactive interface to review surgical procedure videos, identify errors, and generate detailed feedback reports in PDF format. The application integrates AI-powered feedback and annotations to enhance the learning experience.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Features
 
-Currently, two official plugins are available:
+- **Frame-by-Frame Navigation**: Navigate through surgical procedure frames with keyboard controls.
+- **Error Annotations**: View detailed annotations for errors detected in specific frames.
+- **AI-Powered Chatbot**: Ask NORA AI for insights and suggestions on surgical techniques.
+- **PDF Report Generation**: Generate comprehensive feedback reports in PDF format.
+- **Customizable Branding**: Tailor the report's branding to your organization.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## How to Use
 
-## React Compiler
+1. **Load Data**: The application uses a preloaded JSON file (`dummy-file.json`) containing metadata and error annotations for a surgical procedure.
+2. **Navigate Frames**: Use the arrow keys to move through the frames and view annotations for errors.
+3. **Ask NORA AI**: Use the chatbot to ask questions about the current frame or error.
+4. **Generate Reports**: Click the "Export PDF" button to generate a detailed feedback report.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+This project is built using modern web technologies:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Frontend
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **React**: A JavaScript library for building user interfaces.
+- **TypeScript**: A superset of JavaScript that adds static typing.
+- **Vite**: A fast build tool for modern web applications.
+- **@react-pdf/renderer**: A library for generating PDF documents in React.
+- **Zod**: A TypeScript-first schema validation library.
+- **React Markdown**: For rendering Markdown content in the chatbot.
+- **Date-fns**: A library for manipulating and formatting dates.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Backend
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Express**: A Node.js framework for building REST APIs.
+- **CORS**: Middleware for handling cross-origin requests.
+- **Node.js**: A JavaScript runtime for server-side development.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### AI Integration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **OpenAI API**: Used to power the NORA AI chatbot for providing feedback and insights.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Development Tools
+
+- **ESLint**: A tool for identifying and fixing code quality issues.
+- **TypeScript ESLint**: Type-aware linting for TypeScript.
+- **Vite Plugin React**: For fast refresh and optimized builds.
+
+## Project Structure
+
+The project is organized as follows:
+
+- **`src/`**: Contains all source code, including components, assets, and utilities.
+- **`public/`**: Static assets like images and logos.
+- **`server.js`**: A lightweight Express server for handling comments and feedback.
+- **`package.json`**: Defines dependencies and scripts for development.
+
+## Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd SurgicalFeedbackViewer
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Start the backend server:
+   ```bash
+   npm run start:server
+   ```
+5. Open the application in your browser at `http://localhost:5173`.
+
+## License
+
+This project is licensed under the MIT License.
