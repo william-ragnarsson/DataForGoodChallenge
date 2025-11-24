@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: "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", // of process.env.OPENAI_API_KEY in Next.js
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true // alleen voor demo, gebruik serverproxy in productie
 });
 
