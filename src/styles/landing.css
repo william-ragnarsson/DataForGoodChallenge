@@ -241,7 +241,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin-bottom: var(--space-12);
 }
 
 /* --- Hero ---------------------------------------------------------------- */
@@ -271,8 +270,8 @@
 
 .lp-hero-inner {
   position: relative;
-  padding-top: var(--space-16);
-  padding-bottom: 0;
+  padding-top: clamp(var(--space-16), 13vh, 10rem);
+  padding-bottom: clamp(var(--space-16), 13vh, 10rem);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -298,222 +297,6 @@
   line-height: 1.55;
   color: var(--text-muted);
   max-width: 48ch;
-}
-
-/* --- Hero visual: mosaic + timeline -------------------------------------- */
-
-/* Bleed out of the container's gutter so the panel meets the vertical rails.
-   `align-self: stretch` rather than an explicit width — the hero is a centred
-   flex column, which would otherwise shrink-wrap this. */
-.lp-visual {
-  align-self: stretch;
-  margin: 0 calc(var(--gutter) * -1);
-}
-
-.lp-mosaic {
-  position: relative;
-  /* Width must be definite, or `max-height` makes the box shrink sideways to
-     preserve the ratio instead of simply cropping the height. */
-  width: 100%;
-  aspect-ratio: 28 / 11;
-  max-height: 38vh;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-  background: #060606;
-}
-
-/* 28x16 source, upscaled hard. Nothing anatomical survives this.
-   `fill` rather than `cover` so each source pixel maps to exactly one cell of
-   the grid overlay below — cropping would knock the two out of alignment. */
-.lp-mosaic-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  image-rendering: pixelated;
-  filter: grayscale(0.78) brightness(0.55) contrast(1.35);
-  opacity: 0.5;
-}
-
-.lp-mosaic-tint {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-      160deg,
-      rgba(155, 93, 229, 0.32) 0%,
-      transparent 55%
-    ),
-    radial-gradient(ellipse at 50% 120%, rgba(10, 10, 10, 0.95), transparent 70%);
-  mix-blend-mode: screen;
-}
-
-.lp-mosaic-grid {
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0.05) 0 1px,
-      transparent 1px calc(100% / 28)
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.05) 0 1px,
-      transparent 1px calc(100% / 16)
-    );
-}
-
-.lp-mosaic-scan {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(10, 10, 10, 0.15) 60%,
-    rgba(10, 10, 10, 0.85) 100%
-  );
-}
-
-.lp-hud {
-  position: absolute;
-  font-family: var(--font-mono);
-  font-size: var(--step-mono);
-  letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.55);
-  padding: 0.4rem 0.6rem;
-  border: 1px solid var(--border);
-  background: rgba(10, 10, 10, 0.5);
-  backdrop-filter: blur(6px);
-}
-
-.lp-hud-tl {
-  top: 14px;
-  left: 14px;
-}
-
-.lp-hud-tr {
-  top: 14px;
-  right: 14px;
-}
-
-/* Tracked region */
-.lp-region {
-  position: absolute;
-  left: 38%;
-  top: 30%;
-  width: 22%;
-  height: 38%;
-  border: 1px solid var(--accent);
-  box-shadow: 0 0 0 1px rgba(155, 93, 229, 0.25),
-    0 0 40px rgba(155, 93, 229, 0.35);
-  animation: lp-breathe 4s ease-in-out infinite;
-}
-
-@keyframes lp-breathe {
-  0%,
-  100% {
-    opacity: 0.75;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.lp-region-corner {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  border: 1.5px solid var(--accent);
-}
-
-.lp-c-tl {
-  top: -1px;
-  left: -1px;
-  border-right: none;
-  border-bottom: none;
-}
-.lp-c-tr {
-  top: -1px;
-  right: -1px;
-  border-left: none;
-  border-bottom: none;
-}
-.lp-c-bl {
-  bottom: -1px;
-  left: -1px;
-  border-right: none;
-  border-top: none;
-}
-.lp-c-br {
-  bottom: -1px;
-  right: -1px;
-  border-left: none;
-  border-top: none;
-}
-
-.lp-region-label {
-  position: absolute;
-  bottom: calc(100% + 7px);
-  left: -1px;
-  white-space: nowrap;
-  font-family: var(--font-mono);
-  font-size: var(--step-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #fff;
-  background: var(--accent);
-  padding: 0.25rem 0.5rem;
-}
-
-/* Timeline */
-.lp-timeline {
-  padding: var(--space-4) var(--gutter) var(--space-8);
-}
-
-.lp-timeline-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-3);
-  gap: var(--space-4);
-}
-
-.lp-timeline-track {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(51, 1fr);
-  gap: 2px;
-  height: 34px;
-}
-
-.lp-tick {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 1px;
-}
-
-.lp-tick-flagged {
-  background: var(--accent);
-  box-shadow: 0 0 12px var(--accent-dim);
-}
-
-.lp-playhead {
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  width: 1px;
-  background: #fff;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-  animation: lp-sweep 9s linear infinite;
-}
-
-@keyframes lp-sweep {
-  from {
-    left: 0%;
-  }
-  to {
-    left: 100%;
-  }
 }
 
 /* --- Context strip ------------------------------------------------------- */
@@ -980,10 +763,6 @@
     padding-bottom: var(--space-16);
   }
 
-  .lp-mosaic {
-    aspect-ratio: 4 / 3;
-  }
-
   .lp-nav-inner {
     gap: var(--space-4);
   }
@@ -992,21 +771,7 @@
     grid-template-columns: 1fr;
   }
 
-  .lp-hud-tr {
-    display: none;
-  }
-
   .lp-btn {
     width: 100%;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lp-playhead,
-  .lp-region {
-    animation: none;
-  }
-  .lp-playhead {
-    left: 62%;
   }
 }

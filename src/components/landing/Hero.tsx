@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import HeroMosaic from "./HeroMosaic";
 
 export default function Hero() {
   return (
@@ -24,8 +23,6 @@ export default function Hero() {
             How it works
           </a>
         </div>
-
-        <HeroMosaic />
       </div>
     </section>
   );
