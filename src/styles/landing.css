@@ -275,10 +275,9 @@
    stronger layer. At this cell size the grid is dense, so the alpha has to
    come down or the field reads as a flat haze rather than a grid.
 
-   The violet blobs are clusters of individual cells (built in HeroGrid.tsx)
-   rather than soft gradients, so their shape stays quantised to the grid.
    A radial mask fades the whole field out on every edge, so it never
-   hard-stops against the section border or the vertical rails. */
+   hard-stops against the section border or the vertical rails. The mask on
+   this element also clips the scan layers nested inside it. */
 
 .lp-hero-grid {
   --cell: 10px;
@@ -308,30 +307,81 @@
   );
 }
 
-/* Animating the cluster rather than its cells keeps this to five animated
-   elements instead of a few hundred. */
-.lp-blob {
+/* --- Upward scan --------------------------------------------------------
+   A soft band that travels up the hero and loops.
+
+   The cell quantisation comes entirely from the masks, which are static. That
+   lets the gradient underneath move *continuously* — the cells still read as
+   discrete cells, they just brighten and dim gradually instead of snapping a
+   row at a time. Stepping the motion instead made the climb visibly jitter.
+
+   Only the innermost element animates, and it animates `transform`, so the
+   compositor handles it rather than repainting the band every frame. */
+
+.lp-scan {
   position: absolute;
-  animation: lp-blob-breathe 9s ease-in-out infinite;
+  inset: 0;
+  /* Rows: hide the 1px gridline, keep the cell interior. */
+  -webkit-mask-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 1px,
+    #000 1px var(--cell)
+  );
+  mask-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 1px,
+    #000 1px var(--cell)
+  );
 }
 
-@keyframes lp-blob-breathe {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-  50% {
-    opacity: 1;
-  }
+.lp-scan-band {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Columns. Split across two elements so neither needs mask-composite. */
+  -webkit-mask-image: repeating-linear-gradient(
+    to right,
+    transparent 0 1px,
+    #000 1px var(--cell)
+  );
+  mask-image: repeating-linear-gradient(
+    to right,
+    transparent 0 1px,
+    #000 1px var(--cell)
+  );
 }
 
-/* Offset by 1px so each cell sits inside its box and the gridlines that bound
-   it stay visible. */
-.lp-blob-cell {
+/* Two tiles tall, so there is always coverage below as it rises. */
+.lp-scan-inner {
   position: absolute;
-  width: calc(var(--cell) - 1px);
-  height: calc(var(--cell) - 1px);
-  background: var(--accent);
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(var(--cell) * 144);
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 44%,
+    rgba(155, 93, 229, 0.03) 56%,
+    rgba(155, 93, 229, 0.24) 72%,
+    rgba(155, 93, 229, 0.03) 88%,
+    transparent 97%,
+    transparent 100%
+  );
+  background-size: 100% calc(var(--cell) * 72);
+  background-repeat: repeat-y;
+  will-change: transform;
+  animation: lp-scan-up 20s linear infinite;
+}
+
+/* Travels exactly one tile, so start and end frames are identical. */
+@keyframes lp-scan-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, calc(var(--cell) * -72), 0);
+  }
 }
 
 .lp-hero-inner {
@@ -846,16 +896,10 @@
     --cell: 8px;
   }
 
-  /* There is no room to keep the clusters clear of the headline at this width,
-     so drop their alpha — they stay texture and the type stays crisp. */
-  .lp-blob-cell {
-    background: var(--accent-dim);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lp-blob {
+  .lp-scan-inner {
     animation: none;
-    opacity: 0.8;
   }
 }
