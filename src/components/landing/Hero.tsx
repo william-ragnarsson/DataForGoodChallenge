@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
+import HeroGrid from "./HeroGrid";
 
 export default function Hero() {
   return (
     <section className="lp-hero">
+      {/* Background texture only — sits behind the type, never competes with it. */}
+      <HeroGrid />
+
       <div className="lp-container lp-hero-inner">
         <p className="lp-eyebrow">
           <span className="lp-eyebrow-dot" />
