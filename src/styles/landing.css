@@ -1,0 +1,909 @@
+/* ==========================================================================
+   Landing page.
+
+   The whole layout is built from 1px hairlines. Sections carry a full-bleed
+   bottom border; the inner container carries left and right borders, so a
+   continuous vertical rail runs the length of the page and every section
+   border crosses it. Cards share borders rather than floating in gaps.
+
+   Everything here is scoped under .lp (or .lp-* ) so it cannot leak into the
+   tool, which styles itself inline.
+   ========================================================================== */
+
+:root {
+  --nav-h: 52px;
+}
+
+/* --- Nav (shared by both routes) ----------------------------------------- */
+
+.lp-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-h);
+  z-index: 100;
+  background: rgba(10, 10, 10, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-nav-inner {
+  height: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.lp-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--text);
+}
+
+.lp-wordmark-ai {
+  color: var(--accent);
+  margin-left: 0.28em;
+}
+
+.lp-wordmark-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.lp-nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.lp-nav-link {
+  position: relative;
+  font-size: var(--step-small);
+  color: var(--text-muted);
+  padding: 0.35rem 0;
+  transition: color 0.15s ease;
+}
+
+.lp-nav-link:hover {
+  color: var(--text);
+}
+
+.lp-nav-link.active {
+  color: var(--text);
+}
+
+.lp-nav-link.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.5rem;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.lp-nav-right {
+  margin-left: auto;
+}
+
+/* The tool assumes it owns the viewport (inline `position: fixed; inset: 0`
+   plus `height: 100%`). Push it below the nav without touching
+   FrameViewer.tsx — the height override matters as much as the offset, since
+   an inline `height: 100%` resolves against the full viewport and would spill
+   the bottom 52px of the tool off-screen. */
+.frame-viewer {
+  top: var(--nav-h) !important;
+  height: calc(100% - var(--nav-h)) !important;
+}
+
+.lp-route-loading {
+  position: fixed;
+  inset: var(--nav-h) 0 0 0;
+  background: var(--bg);
+}
+
+/* --- Page shell ---------------------------------------------------------- */
+
+.lp {
+  display: block;
+  padding-top: var(--nav-h);
+  color: var(--text);
+  background: var(--bg);
+}
+
+.lp-container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.lp-section {
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-section > .lp-container {
+  padding-top: var(--space-24);
+  padding-bottom: var(--space-24);
+}
+
+/* --- Shared type --------------------------------------------------------- */
+
+.lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 var(--space-6);
+  font-family: var(--font-mono);
+  font-size: var(--step-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.lp-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.lp-mono-dim {
+  font-family: var(--font-mono);
+  font-size: var(--step-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.lp-h2 {
+  margin: 0 0 var(--space-6);
+  font-size: var(--step-h2);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.lp-h2-tight {
+  margin-bottom: var(--space-12);
+}
+
+.lp-h3 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--step-h3);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.lp-body {
+  margin: 0;
+  font-size: var(--step-small);
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.lp-lede {
+  margin: 0 0 var(--space-4);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  max-width: 46ch;
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 1.35rem;
+  font-size: var(--step-small);
+  font-weight: 550;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.lp-btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 0 0 1px var(--accent), 0 8px 32px var(--accent-glow);
+}
+
+.lp-btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 0 1px var(--accent-hover), 0 8px 40px var(--accent-dim);
+}
+
+.lp-btn-ghost {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.lp-btn-ghost:hover {
+  border-color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lp-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* --- Hero ---------------------------------------------------------------- */
+
+.lp-hero {
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* Soft violet bloom behind the headline, layered over the grid field. */
+.lp-hero::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: -30%;
+  left: 50%;
+  width: min(1100px, 130vw);
+  height: 700px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    var(--accent-glow) 0%,
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+/* --- Hero ambient grid ---------------------------------------------------
+   Background texture, not an object. The lines are deliberately far fainter
+   than `--border` (0.08) so the page's structural hairlines still read as the
+   stronger layer. At this cell size the grid is dense, so the alpha has to
+   come down or the field reads as a flat haze rather than a grid.
+
+   A radial mask fades the whole field out on every edge, so it never
+   hard-stops against the section border or the vertical rails. The mask on
+   this element also clips the scan layers nested inside it. */
+
+.lp-hero-grid {
+  --cell: 10px;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.035) 0 1px,
+      transparent 1px var(--cell)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.035) 0 1px,
+      transparent 1px var(--cell)
+    );
+  -webkit-mask-image: radial-gradient(
+    ellipse 88% 82% at 50% 48%,
+    #000 40%,
+    transparent 88%
+  );
+  mask-image: radial-gradient(
+    ellipse 88% 82% at 50% 48%,
+    #000 40%,
+    transparent 88%
+  );
+}
+
+/* --- Upward scan --------------------------------------------------------
+   A soft band that travels up the hero and loops.
+
+   The cell quantisation comes entirely from the masks, which are static. That
+   lets the gradient underneath move *continuously* — the cells still read as
+   discrete cells, they just brighten and dim gradually instead of snapping a
+   row at a time. Stepping the motion instead made the climb visibly jitter.
+
+   Only the innermost element animates, and it animates `transform`, so the
+   compositor handles it rather than repainting the band every frame. */
+
+.lp-scan {
+  position: absolute;
+  inset: 0;
+  /* Rows: hide the 1px gridline, keep the cell interior. */
+  -webkit-mask-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 1px,
+    #000 1px var(--cell)
+  );
+  mask-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 1px,
+    #000 1px var(--cell)
+  );
+}
+
+.lp-scan-band {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Columns. Split across two elements so neither needs mask-composite. */
+  -webkit-mask-image: repeating-linear-gradient(
+    to right,
+    transparent 0 1px,
+    #000 1px var(--cell)
+  );
+  mask-image: repeating-linear-gradient(
+    to right,
+    transparent 0 1px,
+    #000 1px var(--cell)
+  );
+}
+
+/* Two tiles tall, so there is always coverage below as it rises. */
+.lp-scan-inner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(var(--cell) * 144);
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 44%,
+    rgba(155, 93, 229, 0.03) 56%,
+    rgba(155, 93, 229, 0.24) 72%,
+    rgba(155, 93, 229, 0.03) 88%,
+    transparent 97%,
+    transparent 100%
+  );
+  background-size: 100% calc(var(--cell) * 72);
+  background-repeat: repeat-y;
+  will-change: transform;
+  animation: lp-scan-up 20s linear infinite;
+}
+
+/* Travels exactly one tile, so start and end frames are identical. */
+@keyframes lp-scan-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, calc(var(--cell) * -72), 0);
+  }
+}
+
+.lp-hero-inner {
+  position: relative;
+  padding-top: clamp(var(--space-16), 13vh, 10rem);
+  padding-bottom: clamp(var(--space-16), 13vh, 10rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lp-hero-title {
+  margin: 0 0 var(--space-6);
+  font-size: var(--step-hero);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  max-width: 16ch;
+  background: linear-gradient(180deg, #ffffff 30%, #b9b2c4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lp-hero-sub {
+  margin: 0 0 var(--space-8);
+  font-size: clamp(1rem, 1.6vw, 1.1875rem);
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 48ch;
+}
+
+/* --- Context strip ------------------------------------------------------- */
+
+/* Specificity has to match `.lp-section > .lp-container` to beat its 6rem
+   section padding — this row is meant to be a thin rule, not a section. */
+.lp-strip > .lp-strip-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--step-mono);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lp-strip-sep {
+  color: rgba(255, 255, 255, 0.18);
+}
+
+/* --- Pitch block --------------------------------------------------------- */
+
+.lp-pitch-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--space-16);
+  align-items: center;
+}
+
+.lp-pitch-list {
+  list-style: none;
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
+.lp-pitch-list li {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--step-small);
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.lp-pitch-num {
+  font-family: var(--font-mono);
+  font-size: var(--step-mono);
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  padding-top: 0.2rem;
+}
+
+/* --- App mockup ---------------------------------------------------------- */
+
+.lp-mock {
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.lp-mock-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.lp-mock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.lp-mock-title {
+  margin-left: auto;
+}
+
+.lp-mock-body {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  min-height: 300px;
+}
+
+.lp-mock-pane {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.lp-mock-left,
+.lp-mock-center {
+  border-right: 1px solid var(--border);
+}
+
+.lp-mock-card {
+  border: 1px solid var(--border);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.lp-mock-card-active {
+  border-color: var(--accent-dim);
+  background: rgba(155, 93, 229, 0.07);
+}
+
+.lp-mock-line {
+  display: block;
+  height: 6px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lp-accent-line {
+  background: var(--accent);
+}
+
+.lp-w-40 { width: 40%; }
+.lp-w-50 { width: 50%; }
+.lp-w-55 { width: 55%; }
+.lp-w-60 { width: 60%; }
+.lp-w-70 { width: 70%; }
+.lp-w-75 { width: 75%; }
+.lp-w-80 { width: 80%; }
+.lp-w-85 { width: 85%; }
+.lp-w-90 { width: 90%; }
+.lp-w-95 { width: 95%; }
+
+.lp-mock-center {
+  justify-content: space-between;
+}
+
+.lp-mock-frame {
+  position: relative;
+  flex: 1;
+  min-height: 150px;
+  border: 1px solid var(--border);
+  background: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.02) 0 8px,
+      transparent 8px 16px
+    ),
+    #0c0c0c;
+}
+
+.lp-mock-region {
+  position: absolute;
+  left: 32%;
+  top: 28%;
+  width: 32%;
+  height: 40%;
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 24px rgba(155, 93, 229, 0.3);
+}
+
+.lp-mock-strip {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 2px;
+  height: 16px;
+}
+
+.lp-mock-tick {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lp-mock-tick-on {
+  background: var(--accent);
+}
+
+.lp-bubble {
+  border: 1px solid var(--border);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lp-bubble-user {
+  border-color: var(--accent-dim);
+  background: rgba(155, 93, 229, 0.09);
+  margin-left: var(--space-6);
+}
+
+.lp-bubble-ai {
+  background: rgba(255, 255, 255, 0.015);
+  margin-right: var(--space-6);
+}
+
+.lp-bubble-sm {
+  padding: 0.55rem;
+}
+
+/* --- Bento grid ---------------------------------------------------------- */
+
+.lp-bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  /* Pull the trailing hairline off so edge cells sit flush on the rail. */
+  margin-right: -1px;
+  margin-bottom: -1px;
+}
+
+.lp-cell {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s ease;
+}
+
+.lp-cell:hover {
+  background: rgba(255, 255, 255, 0.014);
+}
+
+.lp-cell .lp-mono-dim {
+  margin-bottom: var(--space-6);
+}
+
+.lp-span-3 { grid-column: span 3; }
+.lp-span-2 { grid-column: span 2; }
+
+/* `margin-top: auto` pins the visual to the bottom of its cell, so cells in a
+   row line their visuals up regardless of how much copy each one carries. */
+.lp-viz {
+  margin-top: auto;
+  padding-top: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.lp-viz-strip {
+  display: grid;
+  grid-template-columns: repeat(30, 1fr);
+  gap: 2px;
+  height: 28px;
+}
+
+.lp-vtick {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lp-vtick-on {
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-dim);
+}
+
+.lp-anno {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.7rem;
+}
+
+.lp-anno-muted {
+  opacity: 0.55;
+}
+
+.lp-anno-chip {
+  font-size: 0.8125rem;
+  color: var(--text);
+  border-left: 2px solid var(--accent);
+  padding-left: 0.55rem;
+}
+
+.lp-anno-chip-off {
+  border-left-color: var(--text-dim);
+}
+
+.lp-doc {
+  border: 1px solid var(--border);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.lp-code {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.7;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: var(--space-3);
+  overflow-x: auto;
+  background: rgba(255, 255, 255, 0.012);
+}
+
+/* --- How it works -------------------------------------------------------- */
+
+.lp-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+}
+
+.lp-step {
+  padding: var(--space-8) var(--space-8) var(--space-8) 0;
+  border-right: 1px solid var(--border);
+}
+
+.lp-step:first-child {
+  padding-left: 0;
+}
+
+.lp-step:not(:first-child) {
+  padding-left: var(--space-8);
+}
+
+.lp-step:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.lp-step-n {
+  display: block;
+  margin-bottom: var(--space-6);
+  font-family: var(--font-mono);
+  font-size: var(--step-mono);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+}
+
+/* --- Under the hood ------------------------------------------------------ */
+
+.lp-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  margin-right: -1px;
+  margin-bottom: -1px;
+}
+
+.lp-fact {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-6);
+}
+
+.lp-fact-v {
+  margin: var(--space-3) 0 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* --- Closing + footer ---------------------------------------------------- */
+
+.lp-closing-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lp-closing-body {
+  margin-bottom: var(--space-8);
+  max-width: 44ch;
+}
+
+.lp-footer {
+  border-bottom: none;
+}
+
+.lp-footer-inner {
+  padding-top: var(--space-12);
+  padding-bottom: var(--space-12);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.lp-wordmark-static {
+  margin-bottom: var(--space-4);
+}
+
+.lp-footer-note {
+  margin: var(--space-4) 0 0;
+  max-width: 52ch;
+  font-size: var(--step-small);
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.lp-footer-links {
+  display: flex;
+  gap: var(--space-6);
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .lp-pitch-inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+  }
+
+  .lp-cell,
+  .lp-span-3,
+  .lp-span-2 {
+    grid-column: span 6;
+  }
+
+  .lp-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-step,
+  .lp-step:not(:first-child),
+  .lp-step:last-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-6) 0;
+  }
+
+  .lp-facts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lp-mock-body {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-mock-left,
+  .lp-mock-center {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 620px) {
+  .lp-section > .lp-container {
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-16);
+  }
+
+  .lp-nav-inner {
+    gap: var(--space-4);
+  }
+
+  .lp-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-btn {
+    width: 100%;
+  }
+
+  /* Keep the grid reading as texture rather than a coarse checkerboard. */
+  .lp-hero-grid {
+    --cell: 8px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-scan-inner {
+    animation: none;
+  }
+}

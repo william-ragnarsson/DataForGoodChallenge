@@ -1,0 +1,53 @@
+/* Design tokens.
+   Values are lifted from what the app already used inline (FrameViewer/chatbot)
+   rather than invented, so the landing page and the tool read as one product. */
+
+:root {
+  /* Surfaces */
+  --bg: #0a0a0a;
+  --bg-raised: #101010;
+  --bg-pane: #1a1a1a;
+
+  /* Hairlines. The whole layout is built out of these. */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Type */
+  --text: #ffffff;
+  --text-muted: #a1a1a1;
+  --text-dim: #6b6b6b;
+
+  /* Single accent. The teal->navy ORSI gradient stays inside the tool. */
+  --accent: #9b5de5;
+  --accent-dim: rgba(155, 93, 229, 0.35);
+  --accent-glow: rgba(155, 93, 229, 0.15);
+  --accent-hover: #ab74ea;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    monospace;
+
+  /* Type scale */
+  --step-hero: clamp(2.75rem, 7vw, 5.25rem);
+  --step-h2: clamp(1.75rem, 3.2vw, 2.75rem);
+  --step-h3: 1.0625rem;
+  --step-body: 1rem;
+  --step-small: 0.875rem;
+  --step-mono: 0.6875rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* The page gutter. Section hairlines bleed past this to the viewport edge. */
+  --gutter: clamp(1.25rem, 5vw, 5rem);
+  --maxw: 1280px;
+}
