@@ -98,10 +98,14 @@
   margin-left: auto;
 }
 
-/* The tool assumes it owns the viewport (inline `position: fixed; inset: 0`).
-   Push it below the nav without touching FrameViewer.tsx. */
+/* The tool assumes it owns the viewport (inline `position: fixed; inset: 0`
+   plus `height: 100%`). Push it below the nav without touching
+   FrameViewer.tsx — the height override matters as much as the offset, since
+   an inline `height: 100%` resolves against the full viewport and would spill
+   the bottom 52px of the tool off-screen. */
 .frame-viewer {
   top: var(--nav-h) !important;
+  height: calc(100% - var(--nav-h)) !important;
 }
 
 .lp-route-loading {
